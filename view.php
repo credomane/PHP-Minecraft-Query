@@ -7,14 +7,7 @@
 	
 	$Query = new MinecraftQuery( );
 	
-	try
-	{
-		$Query->Connect( MQ_SERVER_ADDR, MQ_SERVER_PORT, MQ_TIMEOUT );
-	}
-	catch( MinecraftQueryException $e )
-	{
-		$Error = $e->getMessage( );
-	}
+	$Result = $Query->Connect( MQ_SERVER_ADDR, MQ_SERVER_PORT, MQ_TIMEOUT );
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -37,9 +30,9 @@
     <div class="container">
 		<h1>Minecraft Query PHP Class</h1>
 
-<?php if( isset( $Error ) ): ?>
+<?php if( !$Result ): ?>
 		<div class="alert-message error">
-			<p><b>Error:</b> <?php echo $Error; ?></p>
+			<p><b>Error:</b> <?php echo $Query->getError(); ?></p>
 		</div>
 <?php else: ?>
 		<div class="row">
