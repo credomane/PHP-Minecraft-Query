@@ -46,12 +46,21 @@ class MinecraftQuery{
 	public function GetRawInfo( ){
 		return isset( $this->RawInfo ) ? $this->RawInfo : false;
 	}
+
 	public function GetInfo( ){
 		return isset( $this->Info ) ? $this->Info : false;
 	}
 
+	public function GetJsonInfo( ){
+		return json_encode( $this->GetInfo() );
+	}
+
 	public function GetPlayers( ){
 		return isset( $this->Players ) ? $this->Players : false;
+	}
+
+	public function GetJsonPlayers( ){
+		return json_encode( $this->GetPlayers() );
 	}
 
 	private function GetChallenge( ){
@@ -161,4 +170,52 @@ class MinecraftQuery{
 		return SubStr( $Data, 5 );
 	}
 }
+
+//These make sure expected function exists and works as expected.
+if(!function_exists("json_encode")){
+	function json_encode($value, $options = null) {
+		$_escape = function ($str) {
+			return addcslashes($str, "\v\t\n\r\f\"\\/");
+		};
+		$out = "";
+		if (is_object($value)) {
+			$class_vars = get_object_vars(($value));
+			$arr = array();
+			foreach ($class_vars as $key => $val) {
+				$arr[$key] = "\"{$_escape($key)}\":\"{$val}\"";
+			}
+			$val = implode(',', $arr);
+			$out .= "{{$val}}";
+		}elseif (is_array($value)) {
+			$obj = false;
+			$arr = array();
+			foreach($value AS $key => $val) {
+				if(!is_numeric($key)) {
+					$obj = true;
+				}
+				$arr[$key] = json_encode($val);
+			}
+			if($obj) {
+				foreach($arr AS $key => $val) {
+					$arr[$key] = "\"{$_escape($key)}\":{$val}";
+				}
+				$val = implode(',', $arr);
+				$out .= "{{$val}}";
+			}else {
+				$val = implode(',', $arr);
+				$out .= "[{$val}]";
+			}
+		}elseif (is_bool($value)) {
+			$out .= $value ? 'true' : 'false';
+		}elseif (is_null($value)) {
+			$out .= 'null';
+		}elseif (is_string($value)) {
+			$out .= "\"{$_escape($value)}\"";
+		}else {
+			$out .= $value;
+		}
+		return "{$out}";
+	}
+}
+
 ?>
